@@ -1,25 +1,34 @@
 // File: ./src/auth-cluster.js
 
-import React, {useState, useEffect} from "react"
-import * as fcl from "@onflow/fcl"
+import { useCurrentUser } from './hooks/current-user';
+
+function WithAuth() {
+  const cu = useCurrentUser()
+
+  return !cu.loggedIn ? null : (
+    <div>
+      <span>{cu.addr ?? "No Address"}</span>
+      <button onClick={cu.logOut}>Log Out</button>
+    </div>
+  )
+}
+
+function SansAuth() {
+  const cu = useCurrentUser()
+
+  return cu.loggedIn ? null : (
+    <div>
+      <button onClick={cu.logIn}>Log In</button>
+      <button onClick={cu.signUp}>Sign Up</button>
+    </div>
+  )
+}
 
 export function AuthCluster() {
-  const [user, setUser] = useState({loggedIn: null})
-  useEffect(() => fcl.currentUser().subscribe(setUser), [])
-
-  if (user.loggedIn) {
-    return (
-      <div>
-        <span>{user?.addr ?? "No Address"}</span>
-        <button onClick={fcl.unauthenticate}>Log Out</button>
-      </div>
-    )
-  } else {
-    return (
-      <div>
-        <button onClick={fcl.logIn}>Log In</button>
-        <button onClick={fcl.signUp}>Sign Up</button>
-      </div>
-    )
-  }
+  return (
+    <>
+      <WithAuth />
+      <SansAuth />
+    </>
+  )
 }
